@@ -3,6 +3,7 @@
 >> roslaunch move_group.launch
 >> roslaunch mir_2dnav 2dnav.launch
 >> rviz
+	(visualize robotmodel and map)
 
 Direct Base Control
 -------------------
