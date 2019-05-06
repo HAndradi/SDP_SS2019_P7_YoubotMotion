@@ -6,8 +6,9 @@
 
 Direct Base Control
 -------------------
+>> roslaunch mcr_direct_base_controller direct_base_controller.launch
 >> rostopic pub /mcr_navigation/direct_base_controller/input_pose           
-	(tab complete and give pose in a static frame) 
+	(tab complete and give pose in a static frame_id: e.g. "map") 
 
 >> rostopic pub /mcr_navigation/direct_base_controller/coordinator/event_in std_msgs/String "data: 'e_start'"
 
