@@ -1,0 +1,26 @@
+>> roslaunch mir_bringup_sim robot.launch
+>> roscd ~/kinetic/src/mas_industrial_robotics/mir_manipulation/mir_moveit_youbot/youbot-brsu-1
+>> roslaunch move_group.launch
+>> roslaunch mir_2dnav 2dnav.launch
+>> rviz
+
+Direct Base Control
+-------------------
+>> rostopic pub /mcr_navigation/direct_base_controller/input_pose           
+	(tab complete and give pose in a static frame) 
+
+>> rostopic pub /mcr_navigation/direct_base_controller/coordinator/event_in std_msgs/String "data: 'e_start'"
+
+
+Move_Base
+---------
+Edit state machine to skip barrier tape detection
+
+>> roslaunch mir_move_base_safe move_base.launch
+>> rosrun mir_move_base_safe move_base_safe_server.py
+>> rosrun mir_move_base_safe move_base_safe_client_test.py SOURCE_NAME DESTINATION_NAME
+	(replace SOURCE_NAME and DESTINATION_NAME with previously recorded navigation goals) 
+
+
+
+
