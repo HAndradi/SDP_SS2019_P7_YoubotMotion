@@ -22,7 +22,6 @@ Date: 29.04.2019
    * Learn more about ROS combined with C++
 
 
-## Project 7: Synchronized base and arm motions
 Date: 06.05.2019
 
 <Mihir Mulye>:
@@ -42,4 +41,25 @@ Date: 06.05.2019
    * Got a better undestanding of the pipeline for the Manipulation and learned a little bit about yb_actions libraries. 
    * Extract useful information from the yb_actions libraries to share with my group 
    * Might be difficult to decide on a flexible but robust architecture for the whole body motion
+   
+   
+Date: 13.05.2019
+
+<Mihir Mulye>:
+
+   *  
+   * 
+   * 
+
+<Heruka Andradi>:
+
+   * Wrote a simple script to simultaneously control the base and arm (using moveit and move_base) by publishing the goal location and arm position names to a rostopic. Tried to debug moveit execution failures.
+   * Incorporate direct_base_control and moveit based arm control using joint angle commands to the current script.
+   * Might be difficult to handle simultaneous base motion commands to move_base and direct_base_control
+
+<Carlo Wiesse>:
+
+   *  
+   *
+   * 
 
