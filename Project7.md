@@ -47,8 +47,8 @@ Date: 13.05.2019
 
 <Mihir Mulye>:
 
-   *  
-   * 
+   * Worked on basic control flow of the task process 
+   * Work with Heruka to modify the task process according to his code. Modify the test code according to the repository code 
    * 
 
 <Heruka Andradi>:
