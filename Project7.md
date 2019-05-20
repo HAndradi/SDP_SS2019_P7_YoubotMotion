@@ -1,6 +1,6 @@
 
 ## Project 7: Synchronized base and arm motions
-Date: 29.04.2019
+# Date: 29.04.2019
 
 Mihir Mulye:
 
