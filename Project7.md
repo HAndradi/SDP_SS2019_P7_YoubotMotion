@@ -67,9 +67,9 @@ Carlo Wiesse:
 
 Mihir Mulye:
 
-   * 
-   *  
-   * 
+   * Tried to refactor the main code according to the sample repository code 
+   *  Will try to refactor the main code as i had some issues with the last attempt. Construct the flowchart which Heruka created. 
+   * Might face some issues while refactoring the code. 
 
 Heruka Andradi:
 
