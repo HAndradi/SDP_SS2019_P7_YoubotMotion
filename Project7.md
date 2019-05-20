@@ -1,6 +1,6 @@
 
 ## Project 7: Synchronized base and arm motions
-# Date: 29.04.2019
+### Date: 29.04.2019
 
 Mihir Mulye:
 
@@ -22,7 +22,7 @@ Carlo Wiesse:
    * Learn more about ROS combined with C++
 
 
-Date: 06.05.2019
+### Date: 06.05.2019
 
 Mihir Mulye:
 
@@ -43,7 +43,7 @@ Carlo Wiesse:
    * Might be difficult to decide on a flexible but robust architecture for the whole body motion
    
    
-Date: 13.05.2019
+### Date: 13.05.2019
 
 Mihir Mulye:
 
@@ -62,4 +62,25 @@ Carlo Wiesse:
    *  
    *
    * 
+   
+### Date: 20.05.2019
+
+Mihir Mulye:
+
+   * 
+   *  
+   * 
+
+Heruka Andradi:
+
+   * Tested using move_base and direct_base_control to give simultaneous base motion commands to the robot.
+   * Decide how to handle simultaneous base motion commands and implement using a simple python script.
+   * Might not be possible to effectively hand simultaneous base motion commands without modifying the move_base and direct_base_control packages.
+
+Carlo Wiesse:
+
+   *  
+   *
+   * 
+
 
