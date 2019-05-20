@@ -59,9 +59,8 @@ Heruka Andradi:
 
 Carlo Wiesse:
 
-   *  
-   *
-   * 
+   * Implementation of custom cartisian velocity controller package using C++
+   * Add preemted functionality to such package.
    
 ### Date: 20.05.2019
 
@@ -79,8 +78,7 @@ Heruka Andradi:
 
 Carlo Wiesse:
 
-   *  
-   *
-   * 
+   * mcr_moveit_client package revision and transfer knowledge about it to teammates.
+   * Contribution to graphical representation of pipeline by listing topics and message types to communicate with arm.
 
 
