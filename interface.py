@@ -1,25 +1,24 @@
 #not sure of the import statement as of 21/05 
 #can we make a cmake file
 
-import ./msg/goal_message.msg
-import msg.status_message.msg
-import brics_actuator.msg 
-import geometry_msgs.msg
-import std_msgs.msg
+from sdp_project_msgs.msg import StatusMessage, GoalMessage
+from brics_actuator.msg import JointPositions
+from geometry_msgs.msg import PoseStamped, TwistStamped
+from std_msgs.msg import String
 
 class Interface(object):
 
 	def __init__(self):
 	    
-	    rospy.Subscriber("~goal",goal_message,self.goal_cb)
+	    rospy.Subscriber("~goal",GoalMessage,self.goal_cb)
 	    rospy.Subscriber("~event_start",bool,self.event_start_cb)
-	    self.status_pub = rospy.Publisher("~status",status_message,queue_size=1)
-	    self.move_base_pub = rospy.Publisher("~move_base",std_msgs.msg.String,queue_size=1)
-	    self.direct_base_pub = rospy.Publisher("~direct_base",geometry_msgs.msg.PoseStamped,queue_size=1)
-	    self.moveit_client1_pub = rospy.Publisher("~moveit_client1",std_msgs.msg.String,queue_size=1)
-	    self.moveit_client2_pub = rospy.Publisher("~moveit_client2",brics_actuator.msg.JointPositions,queue_size=1)
-	    self.moveit_client3_pub = rospy.Publisher("~moveit_client3",geometry_msgs.msg.PoseStamped,queue_size=1)
-	    self.velocity_pub = rospy.Publisher("~velocity_arm",geometry_msgs.msg.TwistStamped,queue_size=1)
+	    self.status_pub = rospy.Publisher("~status",StatusMessage,queue_size=1)
+	    self.move_base_pub = rospy.Publisher("~move_base",String,queue_size=1)
+	    self.direct_base_pub = rospy.Publisher("~direct_base", PoseStamped,queue_size=1)
+	    self.moveit_client1_pub = rospy.Publisher("~moveit_client1",String,queue_size=1)
+	    self.moveit_client2_pub = rospy.Publisher("~moveit_client2",JointPositions,queue_size=1)
+	    self.moveit_client3_pub = rospy.Publisher("~moveit_client3",PoseStamped,queue_size=1)
+	    self.velocity_pub = rospy.Publisher("~velocity_arm",TwistStamped,queue_size=1)
 	
 	def goal_cb(self,goal):
 	    #for base 
