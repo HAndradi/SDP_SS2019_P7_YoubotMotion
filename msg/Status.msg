@@ -1,0 +1,3 @@
+bool sm_status
+std_msgs/String current_task 
+
