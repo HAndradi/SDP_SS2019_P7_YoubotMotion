@@ -1,5 +1,5 @@
 >> roslaunch mir_bringup_sim robot.launch
->> roscd ~/kinetic/src/mas_industrial_robotics/mir_manipulation/mir_moveit_youbot/youbot-brsu-1
+>> cd ~/kinetic/src/mas_industrial_robotics/mir_manipulation/mir_moveit_youbot/youbot-brsu-1
 >> roslaunch move_group.launch
 >> roslaunch mir_2dnav 2dnav.launch
 >> rviz
