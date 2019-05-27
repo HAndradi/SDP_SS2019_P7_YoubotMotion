@@ -28,7 +28,7 @@ Mihir Mulye:
 
    * I installed youbot simulation software 
    * I will learn how to use the software in a more detailed manner
-   * 
+   
 
 Heruka Andradi:
 
@@ -49,7 +49,7 @@ Mihir Mulye:
 
    * Worked on basic control flow of the task process 
    * Work with Heruka to modify the task process according to his code. Modify the test code according to the repository code 
-   * 
+   
 
 Heruka Andradi:
 
@@ -86,7 +86,7 @@ Carlo Wiesse:
 Mihir Mulye:
 
    * Carlo and I created message files and Interface files.
-   *
+   * 
    *
   
 
