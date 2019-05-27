@@ -80,5 +80,26 @@ Carlo Wiesse:
 
    * mcr_moveit_client package revision and transfer knowledge about it to teammates.
    * Contribution to graphical representation of pipeline by listing topics and message types to communicate with arm.
+   
+### Date: 27.05.2019
+
+Mihir Mulye:
+
+   *
+   *
+   *
+  
+
+Heruka Andradi:
+
+   * Made a ros package to provide move_base and direct_base_controller based motion commands to the youbot using a single rostopic. Identified how to obtain the node name of subscribers for monitoring and feedback.
+   * Incorporate moveit and monitoring to the ros package. Figure out how to cancel move_base_safe commands
+   * Might not be able to cancel move_base_safe commands without modifying the move_base_safe package
+
+Carlo Wiesse:
+
+   *
+   *
+   *
 
 
