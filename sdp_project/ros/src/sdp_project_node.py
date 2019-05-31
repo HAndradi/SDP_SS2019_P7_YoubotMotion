@@ -15,10 +15,10 @@ class Interface(object):
 	    self.status_pub = rospy.Publisher("~status",StatusMessage,queue_size=1)
 	    self.move_base_pub = rospy.Publisher("~move_base",String,queue_size=1)
 	    self.direct_base_pub = rospy.Publisher("~direct_base", PoseStamped,queue_size=1)
-	    self.moveit_client1_pub = rospy.Publisher("~moveit_client1",String,queue_size=1)
-	    self.moveit_client2_pub = rospy.Publisher("~moveit_client2",JointPositions,queue_size=1)
-	    self.moveit_client3_pub = rospy.Publisher("~moveit_client3",PoseStamped,queue_size=1)
-	    self.velocity_pub = rospy.Publisher("~velocity_arm",TwistStamped,queue_size=1)
+	    self.arm_goal_name_pub = rospy.Publisher("~arm_goal_name",String,queue_size=1)
+	    self.arm_joint_goal_pub = rospy.Publisher("~arm_joint_goal",JointPositions,queue_size=1)
+	    self.arm_goal_pose_pub = rospy.Publisher("~arm_goal_pose",PoseStamped,queue_size=1)
+	    self.arm_velocity_pub = rospy.Publisher("~velocity_arm",TwistStamped,queue_size=1)
 	
 	def goal_cb(self,msg):
 	    #for base 
