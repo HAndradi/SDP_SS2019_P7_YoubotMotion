@@ -1,5 +1,4 @@
-string request_node
+string result_node
 string action_type
 string status
-string error
 

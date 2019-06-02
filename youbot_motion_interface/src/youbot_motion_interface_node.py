@@ -8,9 +8,10 @@ import geometry_msgs.msg
 from std_msgs.msg import String
 from youbot_motion_interface.msg import Goal
 from youbot_motion_interface.msg import Acknowledgement
+from youbot_motion_interface.msg import Result
 
 def base_goal_cb(msg):
-    global state, new_action, stop_current_action, goal_pose, goal_name, request_node_caller_id
+    global state, new_action, stop_current_action, goal_pose, goal_name, request_node_caller_id, preempted_node_caller_id
  
     if msg.action_type == msg.ACTION_TYPE_DBC_POSE:
         action = 'DBC_POSE'        
@@ -22,6 +23,7 @@ def base_goal_cb(msg):
         action = 'INVALID_ACTION TYPE'
 
     if (not state == 'IDLE') and msg.stop_current_action:
+        preempted_node_caller_id = request_node_caller_id
         stop_current_action = True   
     else:
         stop_current_action = False 
@@ -59,18 +61,31 @@ def acknowledge(status, action_type = 'UNSPECIFIED', request_node = 'unknown', m
     global state, new_action, request_node_caller_id
     acknowledgement_msg = Acknowledgement()
     if status == 'accepted':
-        acknowledgement_msg.requesting_node = request_node_caller_id 
+        acknowledgement_msg.request_node = request_node_caller_id 
         acknowledgement_msg.action_type = new_action
         acknowledgement_msg.status = status
         acknowledgement_msg.error = message
         state = new_action
     else:      
-        acknowledgement_msg.requesting_node = request_node 
+        acknowledgement_msg.request_node = request_node 
         acknowledgement_msg.action_type = action_type
         acknowledgement_msg.status = status
         acknowledgement_msg.error = message
     acknowledgement_pub.publish(acknowledgement_msg)
     new_action = 'UNSPECIFIED'
+
+
+def send_result(status):
+    global state, request_node_caller_id
+    result_msg = Result()
+    result_msg.action_type = state
+    result_msg.status = status
+    if status == 'stopped':
+        result_msg.result_node = preempted_node_caller_id
+    else:
+        result_msg.result_node = request_node_caller_id
+    result_pub.publish(result_msg)
+        
 
 def states():
     global state, new_action, stop_current_action, goal_pose, goal_name, dbc_status, move_base_status, request_node_caller_id
@@ -97,16 +112,16 @@ def states():
 
         elif state == 'MOVE_BASE_POSE' or state == 'MOVE_BASE_NAME':
             if not move_base_status == 'waiting':
+                send_result(move_base_status)        
                 state = 'IDLE'
-                print 'move base outcome: ' + move_base_status
             if stop_current_action == True:
                 stop_current_action = False
                 move_base_event_in_pub.publish('e_stop')
                 
         elif state == 'DBC_POSE':
             if not dbc_status == 'waiting':
+                send_result(dbc_status)
                 state = 'IDLE'
-                print 'dbc outcome: ' + dbc_status
             if stop_current_action == True:
                 stop_current_action = False
                 dbc_event_in_pub.publish('e_stop')
@@ -126,6 +141,7 @@ if __name__ == '__main__':
 
     rospy.Subscriber('~youbot_motion_goal', Goal, base_goal_cb, queue_size=1)
     acknowledgement_pub = rospy.Publisher('~youbot_motion_acknowledgement', Acknowledgement, queue_size=0)
+    result_pub = rospy.Publisher('~youbot_motion_result', Result, queue_size=0)
 
     states()
 
