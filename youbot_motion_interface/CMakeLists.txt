@@ -52,6 +52,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    Goal.msg
+   Acknowledgement.msg
+   Result.msg
 #   Message1.msg
 #   Message2.msg
 )
