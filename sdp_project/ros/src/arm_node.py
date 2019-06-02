@@ -12,6 +12,7 @@ class ArmInterface(object):
 	    self.arm_goal_name_pub = rospy.Publisher("/moveit_client/target_string_pose",String,queue_size=1)
 	    self.arm_goal_joints_pub = rospy.Publisher("/moveit_client/target_configuration",JointPositions,queue_size=1)
 	    self.arm_goal_pose_pub = rospy.Publisher("/moveit_client/target_pose",PoseStamped,queue_size=1)
+	    self.event_pub = rospy.Publisher("/moveit_client/event_in",String,queue_size=1)
 
 	def update(self):
 	    rospy.Subscriber("~goal",Arm,self.goal_cb)
@@ -19,21 +20,25 @@ class ArmInterface(object):
 	
 	def goal_cb(self,msg):
 	    
-	    if msg.arm_action_type == msg.ARM_ACTION_TYPE_NAME: 
+	    if msg.arm_action_type == msg.ARM_ACTION_TYPE_NAME:
+		self.event_pub.publish("e_start")
 	    	self.arm_goal_name_pub.publish(msg.name.data)
             	rospy.loginfo("Goal name given")
 
-	    elif msg.arm_action_type == msg.ARM_ACTION_TYPE_POSE: 
+	    elif msg.arm_action_type == msg.ARM_ACTION_TYPE_POSE:
+		self.event_pub.publish("e_start")
 	    	self.arm_goal_pose_pub.publish(msg.pose)
             	rospy.loginfo("Goal pose given")
 
-	    elif msg.arm_action_type == msg.ARM_ACTION_TYPE_JOINTS: 
+	    elif msg.arm_action_type == msg.ARM_ACTION_TYPE_JOINTS:
+		self.event_pub.publish("e_start")
 	    	self.arm_goal_joints_pub.publish(msg.joints)
             	rospy.loginfo("Goal joints given")
  
-	    elif msg.arm_action_type == msg.ARM_ACTION_TYPE_VELOCITY: 
-	    	self.arm_goal_pose_pub.publish(msg.pose)
-            	rospy.loginfo("Goal pose given")
+#	    elif msg.arm_action_type == msg.ARM_ACTION_TYPE_VELOCITY:
+#		self.event_pub.publish("e_start")
+#	    	self.arm_goal_pose_pub.publish(msg.pose)
+#           	rospy.loginfo("Goal pose given")
 
 if __name__ == '__main__':
 
