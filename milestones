@@ -14,7 +14,7 @@ This milestones is reached once the team settles on the number of subscribers/pu
 2
 Exploring available resources
 
-what? Since we'll be working with the KUKA arm and base, many of the desired functionalities for our porject have already been implemented and can be found in the b-it-bots repositories.
+what? Since we'll be working with the KUKA arm and base, many of the desired functionalities for our project have already been implemented and can be found in the b-it-bots repositories.
 
 why? It would be wise to locate the packages that can be useful to us and undestand how they work. This will save us time and effort.
 
