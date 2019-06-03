@@ -105,7 +105,7 @@ Carlo Wiesse:
 Mihir Mulye:
 
    * worked with Carlo on the activation of arm 
-   * test the youbot interface node package on the youbot 
+   * test the youbot interface node package on the youbot. write a test script to publish commands to the youbot_interface_node by passing arguements to a python file
    * everthing works fine on simulation but there might be some unforeseen circumstances which might cause the test to fail on real robot. 
   
 
