@@ -86,9 +86,7 @@ Carlo Wiesse:
 Mihir Mulye:
 
    * Carlo and I created message files and Interface files.
-   * 
-   *
-  
+    
 
 Heruka Andradi:
 
@@ -106,9 +104,9 @@ Carlo Wiesse:
 
 Mihir Mulye:
 
-   * 
-   * 
-   *
+   * worked with Carlo on the activation of arm 
+   * test the youbot interface node package on the youbot 
+   * everthing works fine on simulation but there might be some unforeseen circumstances which might cause the test to fail on real robot. 
   
 
 Heruka Andradi:
