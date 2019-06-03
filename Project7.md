@@ -85,9 +85,7 @@ Carlo Wiesse:
 
 Mihir Mulye:
 
-   * Carlo and I created message files and Interface files.
-   * 
-   *
+   * Carlo and I created message files and Interface files
   
 
 Heruka Andradi:
