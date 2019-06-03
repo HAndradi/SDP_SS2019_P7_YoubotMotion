@@ -86,7 +86,9 @@ Carlo Wiesse:
 Mihir Mulye:
 
    * Carlo and I created message files and Interface files.
-    
+   * 
+   *
+  
 
 Heruka Andradi:
 
@@ -104,16 +106,16 @@ Carlo Wiesse:
 
 Mihir Mulye:
 
-   * worked with Carlo on the activation of arm 
-   * test the youbot interface node package on the youbot. write a test script to publish commands to the youbot_interface_node by passing arguements to a python file
-   * everthing works fine on simulation but there might be some unforeseen circumstances which might cause the test to fail on real robot. 
+   * 
+   * 
+   *
   
 
 Heruka Andradi:
 
-   * 
-   * 
-   * 
+   * Incorporated preemption, request acknowledgement,and result feedback functionalities to the youbot_motion_interface package to give goal pose or goal name based commands to the youbot using move_base or direct_base_control packages.
+   * Integrate arm functionality to the youbot_motion_interface package
+   * Might come across unexpected issues during integration
 
 Carlo Wiesse:
 
