@@ -4,6 +4,11 @@
 >> roslaunch mir_2dnav 2dnav.launch
 >> rviz
 	(visualize robotmodel and map)
+	
+Moveit Commander 
+-------------------
+>> rosrun moveit_commander moveit_commander_cmdline.py 
+>> rostopic pub /arm_node/goal sdp_project/Arm 
 
 Direct Base Control
 -------------------
