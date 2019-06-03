@@ -106,9 +106,9 @@ Carlo Wiesse:
 
 Mihir Mulye:
 
-   * 
-   * 
-   *
+   * Carlo and i worked on the task of moving arm using custom file on the simulation. 
+   * test the package 'youbot_motion_interface package' on the youbot write a script to publish commands to the youbot_motion_interface package by passing arguments to the python file. 
+   
   
 
 Heruka Andradi:
