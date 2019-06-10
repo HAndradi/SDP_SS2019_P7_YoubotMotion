@@ -120,5 +120,26 @@ Carlo Wiesse:
    *
    *
    *
+   
+   ### Date: 10.06.2019
+
+Mihir Mulye:
+
+   * tested the package 'youbot_motion_interface package' on the youbot 
+   * write a script to publish commands to the youbot_motion_interface package by passing arguments to the python file. 
+   
+  
+
+Heruka Andradi:
+
+   * 
+   *
+   *
+   
+Carlo Wiesse:
+
+   *
+   *
+   *
 
 
