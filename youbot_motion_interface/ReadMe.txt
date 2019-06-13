@@ -5,6 +5,7 @@ rviz                                             ---(visualize robotmodel and ma
 roslaunch mcr_direct_base_controller direct_base_controller.launch
 roslaunch mir_move_base_safe move_base.launch
  
+rosrun youbot_motion_interface youbot_motion_interface_node.py
 
 
 
