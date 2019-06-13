@@ -8,6 +8,7 @@ import geometry_msgs.msg
 from std_msgs.msg import String
 from youbot_motion_interface.msg import Goal
 from youbot_motion_interface.msg import Acknowledgement
+from youbot_motion_interface.msg import Monitor
 from youbot_motion_interface.msg import Result
 
 class BaseMotionCoordinator:
@@ -65,6 +66,7 @@ class BaseMotionCoordinator:
 class MotionCoordinator:
     def __init__(self):
         self.acknowledgement_pub = rospy.Publisher('~youbot_motion_acknowledgement', Acknowledgement, queue_size=1)
+        self.monitor_feedback_pub = rospy.Publisher('~youbot_motion_monitor_feedback', Monitor, queue_size=1)
         self.result_pub = rospy.Publisher('~youbot_motion_result', Result, queue_size=1)
         rospy.Subscriber('~youbot_motion_goal', Goal, self.motion_command_cb, queue_size=1)
 
@@ -94,7 +96,7 @@ class MotionCoordinator:
         acknowledgement_msg.caller_id = caller_id 
         acknowledgement_msg.action_type = action_type
         if action_type in range(4):
-            acknowledgement_msg.action_name = ['unkown', 'move base pose', 'move base name', 'dbc'][action_type]
+            acknowledgement_msg.action_name = ['idle', 'move base pose', 'move base name', 'dbc'][action_type]
         else:
             acknowledgement_msg.action_name = 'invalid action type'
         acknowledgement_msg.status_type = status_type
@@ -102,6 +104,14 @@ class MotionCoordinator:
         acknowledgement_msg.error_type = error_type
         acknowledgement_msg.error_msg = ['', 'another action is active and preemption not requested!', 'Invalid goal pose name'][error_type]
         self.acknowledgement_pub.publish(acknowledgement_msg)
+
+    def send_monitor_feedback(self):
+        monitor_feedback_msg = Monitor()
+        monitor_feedback_msg.action_type = self.base_command_action_type 
+        monitor_feedback_msg.action_name = ['idle', 'move base pose', 'move base name', 'dbc'][monitor_feedback_msg.action_type]
+        if monitor_feedback_msg.action_type in range(1,4):
+            monitor_feedback_msg.caller_id = self.base_command_caller_id
+        self.monitor_feedback_pub.publish(monitor_feedback_msg)
 
     def send_result(self, status_type):
         result_msg = Result()
@@ -113,7 +123,7 @@ class MotionCoordinator:
             result_msg.caller_id = self.base_command_caller_id
             result_msg.action_type = self.base_command_action_type
             self.base_command_action_type = Goal().DEFAULT
-        result_msg.action_name = ['unkown', 'move base pose', 'move base name', 'dbc'][result_msg.action_type]
+        result_msg.action_name = ['idle', 'move base pose', 'move base name', 'dbc'][result_msg.action_type]
         result_msg.status = ['failed', 'succeeded', 'preempted'][result_msg.status_type]
         self.result_pub.publish(result_msg)
         
@@ -127,6 +137,7 @@ class MotionCoordinator:
             else:
                 self.execute_move_base_command_state()
             rospy.sleep(0.1)
+            self.send_monitor_feedback()
 
     def execute_idle_state(self):
         if self.base_command_action_type == Goal().ACTION_TYPE_DBC_POSE:
