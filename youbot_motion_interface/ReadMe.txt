@@ -5,6 +5,8 @@ roslaunch ~/kinetic/src/mas_industrial_robotics/mir_manipulation/mir_moveit_youb
 roslaunch mir_2dnav 2dnav.launch
 roslaunch mcr_direct_base_controller direct_base_controller.launch
 roslaunch mir_move_base_safe move_base.launch
+rosrun youbot_motion_interface youbot_motion_interface_node.py
+
 rviz                                                                   ---(visualize robotmodel and map)
 
 Send motion commands by publishing to the following topic
