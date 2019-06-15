@@ -107,10 +107,13 @@ class MotionCoordinator:
 
     def send_monitor_feedback(self):
         monitor_feedback_msg = Monitor()
-        monitor_feedback_msg.action_type = self.base_command_action_type 
-        monitor_feedback_msg.action_name = ['idle', 'move base pose', 'move base name', 'dbc'][monitor_feedback_msg.action_type]
-        if monitor_feedback_msg.action_type in range(1,4):
+        if not self.state == 'IDLE':
             monitor_feedback_msg.caller_id = self.base_command_caller_id
+            monitor_feedback_msg.action_type = self.base_command_action_type 
+            monitor_feedback_msg.action_name = ['idle', 'move base pose', 'move base name', 'dbc'][monitor_feedback_msg.action_type]
+        else: 
+            monitor_feedback_msg.action_type = Monitor().DEFAULT 
+            monitor_feedback_msg.action_name = 'idle'
         self.monitor_feedback_pub.publish(monitor_feedback_msg)
 
     def send_result(self, status_type):
