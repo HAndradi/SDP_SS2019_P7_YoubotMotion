@@ -121,7 +121,7 @@ Carlo Wiesse:
    *
    *
    
-   ### Date: 11.06.2019
+   ### Date: 17.06.2019
 
 Mihir Mulye:
 
@@ -132,8 +132,8 @@ Mihir Mulye:
 
 Heruka Andradi:
 
-   * 
-   *
+   * Refactored the code and seperated the functionality into different classes. Added a monitor feedback functionality.
+   * Integrate the arm_motion_interface package from Carlo to the youbot_motion_interace.
    *
    
 Carlo Wiesse:
