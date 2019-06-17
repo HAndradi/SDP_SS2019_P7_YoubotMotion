@@ -71,34 +71,54 @@ class MotionCoordinator:
         rospy.Subscriber('~youbot_motion_goal', Goal, self.motion_command_cb, queue_size=1)
 
         self.base_motion_coordinator = BaseMotionCoordinator()
-        self.base_command_action_type = Goal().DEFAULT
-        self.state = 'IDLE'
-        self.action_type = Goal().DEFAULT 
+        self.base_command_action_type = Goal().base.DEFAULT
+        self.base_state = 'IDLE'
+        self.arm_state = 'IDLE'
+        self.whole_body_motion_flag = False
 
     def motion_command_cb(self, msg):
-        if not self.state == 'IDLE' and not msg.preempt_current_action:
-            self.send_acknowledgement(msg._connection_header['callerid'], msg.action_type, Acknowledgement().REQUEST_REJECTED, \
-                                      Acknowledgement().DIFFERENT_ACTION_IS_RUNNING_ERROR)
+        if (msg.base.action_type in range(1,4) and not self.base_state == 'IDLE' and not msg.base.preempt_current_action) or \
+                      (msg.arm.action_type in range(1,5) not self.arm_state == 'IDLE' and not msg.arm.preempt_current_action):
+            self.send_acknowledgement(msg._connection_header['callerid'], msg.arm.action_type, msg.base.action_type, \
+                             Acknowledgement().REQUEST_REJECTED, Acknowledgement().DIFFERENT_ACTION_IS_RUNNING_ERROR)                
         else:
-            if not self.state == 'IDLE':
-                self.preempted_caller_id = self.base_command_caller_id
-                self.preempted_action_type = self.base_command_action_type
-                self.base_command_preempt_flag = msg.preempt_current_action
-            else:
-                self.base_command_preempt_flag = False
-            self.base_command_action_type = msg.action_type
-            self.base_command_goal_pose = msg.base_goal_pose
-            self.base_command_goal_name = msg.base_goal_pose_name
-            self.base_command_caller_id = msg._connection_header['callerid']
+            if msg.base.action_type in range(1,4):
+                if not self.base_state == 'IDLE':
+                    self.base_preempted_caller_id = self.base_command_caller_id
+                    self.base_preempted_action_type = self.base_command_action_type
+                    self.base_command_preempt_flag = msg.base.preempt_current_action
+                else:
+                    self.base_command_preempt_flag = False
+                self.base_command_action_type = msg.base.action_type
+                self.base_command_goal_pose = msg.base.goal_pose
+                self.base_command_goal_name = msg.base.goal_pose_name
+                self.base_command_caller_id = msg._connection_header['callerid']
+            if msg.arm.action_type in range(1,5):
+                if not self.arm_state == 'IDLE':
+                    self.arm_preempted_caller_id = self.arm_command_caller_id
+                    self.arm_preempted_action_type = self.arm_command_action_type
+                    self.arm_command_preempt_flag = msg.arm.preempt_current_action
+                else:
+                    self.arm_command_preempt_flag = False
+                self.arm_command_action_type = msg.arm.action_type
+                self.arm_command_goal_pose = msg.arm.goal_pose
+                self.arm_command_goal_name = msg.arm.goal_pose_name
+                self.arm_command_caller_id = msg._connection_header['callerid']
 
-    def send_acknowledgement(self, caller_id, action_type, status_type=Acknowledgement().REQUEST_ACCEPTED , error_type=Acknowledgement().NO_ERROR):
+    def send_acknowledgement(self, caller_id, arm_action_type, base_action_type, status_type=Acknowledgement().REQUEST_ACCEPTED, \
+                                                                                           error_type=Acknowledgement().NO_ERROR):
         acknowledgement_msg = Acknowledgement()
         acknowledgement_msg.caller_id = caller_id 
-        acknowledgement_msg.action_type = action_type
-        if action_type in range(4):
-            acknowledgement_msg.action_name = ['idle', 'move base pose', 'move base name', 'dbc'][action_type]
+        acknowledgement_msg.arm_action_type = arm_action_type
+        acknowledgement_msg.base_action_type = base_action_type
+        if base_action_type in range(4):
+            acknowledgement_msg.base_action_name = ['idle', 'move base pose', 'move base name', 'dbc'][base_action_type]
         else:
-            acknowledgement_msg.action_name = 'invalid action type'
+            acknowledgement_msg.base_action_name = 'invalid action type'
+        if arm_action_type in range(4):
+            acknowledgement_msg.arm_action_name = ['idle', 'moveit name', 'moveit pose', 'moveit joint angles', 'cartesian pose'][arm_action_type]
+        else:
+            acknowledgement_msg.arm_action_name = 'invalid action type'
         acknowledgement_msg.status_type = status_type
         acknowledgement_msg.status = ['rejected', 'accepted'][status_type]
         acknowledgement_msg.error_type = error_type
@@ -107,7 +127,7 @@ class MotionCoordinator:
 
     def send_monitor_feedback(self):
         monitor_feedback_msg = Monitor()
-        if not self.state == 'IDLE':
+        if not self.base_state == 'IDLE':
             monitor_feedback_msg.caller_id = self.base_command_caller_id
             monitor_feedback_msg.action_type = self.base_command_action_type 
             monitor_feedback_msg.action_name = ['idle', 'move base pose', 'move base name', 'dbc'][monitor_feedback_msg.action_type]
@@ -125,7 +145,7 @@ class MotionCoordinator:
         else:
             result_msg.caller_id = self.base_command_caller_id
             result_msg.action_type = self.base_command_action_type
-            self.base_command_action_type = Goal().DEFAULT
+            self.base_command_action_type = Goal().arm.DEFAULT
         result_msg.action_name = ['idle', 'move base pose', 'move base name', 'dbc'][result_msg.action_type]
         result_msg.status = ['failed', 'succeeded', 'preempted'][result_msg.status_type]
         self.result_pub.publish(result_msg)
@@ -133,9 +153,9 @@ class MotionCoordinator:
     def check_states(self):
         print 'READY!'
         while not rospy.is_shutdown():
-            if self.state == 'IDLE':
+            if self.base_state == 'IDLE':
                 self.execute_idle_state()
-            elif self.state == 'DBC':
+            elif self.base_state == 'DBC':
                 self.execute_dbc_command_state()
             else:
                 self.execute_move_base_command_state()
@@ -143,26 +163,30 @@ class MotionCoordinator:
             self.send_monitor_feedback()
 
     def execute_idle_state(self):
-        if self.base_command_action_type == Goal().ACTION_TYPE_DBC_POSE:
-            self.state = 'DBC'
+        base_acknowledgement = 'accepted'
+        if self.base_command_action_type == Goal().arm.ACTION_TYPE_DBC_POSE:
+            self.base_state = 'DBC'
             self.base_motion_coordinator.execute_dbc_motion(self.base_command_goal_pose)
-            self.send_acknowledgement(self.base_command_caller_id, self.base_command_action_type)
-        elif self.base_command_action_type == Goal().ACTION_TYPE_MOVE_BASE_POSE or self.base_command_action_type == Goal().ACTION_TYPE_MOVE_BASE_NAME:
-            if self.base_command_action_type == Goal().ACTION_TYPE_MOVE_BASE_NAME:
+        elif self.base_command_action_type == Goal().arm.ACTION_TYPE_MOVE_BASE_POSE or self.base_command_action_type == Goal().arm.ACTION_TYPE_MOVE_BASE_NAME:
+            if self.base_command_action_type == Goal().arm.ACTION_TYPE_MOVE_BASE_NAME:
                 self.base_command_goal_pose = param_server_utils.get_pose_from_param_server(self.base_command_goal_name)
                 if self.base_command_goal_pose is None:
-                    self.send_acknowledgement(self.base_command_caller_id, self.base_command_action_type, Acknowledgement().REQUEST_REJECTED, \
-                                              Acknowledgement().INVALID_POSE_NAME_ERROR)
-                    self.base_command_action_type = Goal().DEFAULT
+                    base_acknowledgement = 'rejected'
+                    self.base_command_action_type = Goal().arm.DEFAULT
                     return
-            self.state = 'MOVE_BASE'
+            self.base_state = 'MOVE_BASE'
             self.base_motion_coordinator.execute_move_base_motion(self.base_command_goal_pose)
+        if base_acknowledgement == 'accepted':
             self.send_acknowledgement(self.base_command_caller_id, self.base_command_action_type)
+        else:
+            self.send_acknowledgement(self.base_command_caller_id, self.base_command_action_type, Acknowledgement().REQUEST_REJECTED, \
+                                                                                             Acknowledgement().INVALID_POSE_NAME_ERROR)
+        
             
     def execute_dbc_command_state(self):
         if not self.base_motion_coordinator.get_dbc_status() == 'active': 
             self.send_result(self.base_motion_coordinator.dbc_status)
-            self.state = 'IDLE'
+            self.base_state = 'IDLE'
         if self.base_command_preempt_flag:
             self.base_motion_coordinator.preempt_dbc_motion()
             self.base_command_preempt_flag = False
@@ -170,7 +194,7 @@ class MotionCoordinator:
     def execute_move_base_command_state(self):
         if not self.base_motion_coordinator.get_move_base_status() == 'active': 
             self.send_result(self.base_motion_coordinator.move_base_status)
-            self.state = 'IDLE'
+            self.base_state = 'IDLE'
         if self.base_command_preempt_flag:
             self.base_motion_coordinator.preempt_move_base_motion()
             self.base_command_preempt_flag = False
