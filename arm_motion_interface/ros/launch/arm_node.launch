@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+ <node pkg="arm_motion_interface" type="cvc_node.py"
+          name="cvc_node" output="screen">
+
+    <param name="max_cartesian_velocity" type="double" value="0.1"/>
+    <param name="feedback_gain" type="double" value="3"/>
+
+    <remap from="~velocity_command" to="/arm_1/arm_controller/cartesian_velocity_command"/>
+    <remap from="~target_pose" to="/arm_motion_interface_node/cvc_pose_command"/>
+    <remap from="~event_in" to="/arm_motion_interface_node/cvc_event_in"/>
+
+ </node>
+
+ <node pkg="arm_motion_interface" type="arm_motion_interface_node.py"
+          name="arm_motion_interface_node" output="screen">
+
+    <remap from="~moveit_event_out" to="/moveit_client/event_out"/>
+    <remap from="~cvc_event_out" to="/cvc_node/event_out"/>
+
+ </node>
+
+ <node pkg="mcr_moveit_client" type="moveit_client_node"
+          name="moveit_client" output="screen">
+    <rosparam command="load" file="$(find mcr_moveit_client)/ros/config/params.yaml"/>
+    
+	<remap from="~target_string_pose" to="/arm_motion_interface_node/moveit_string_command"/>
+	<remap from="~target_configuration" to="/arm_motion_interface_node/moveit_joint_command"/>
+	<remap from="~target_pose" to="/arm_motion_interface_node/moveit_pose_command"/>
+	<remap from="~event_in" to="/arm_motion_interface_node/moveit_event_in"/>
+
+ </node>
+</launch>
