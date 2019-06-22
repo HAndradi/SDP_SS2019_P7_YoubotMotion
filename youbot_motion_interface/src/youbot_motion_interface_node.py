@@ -11,6 +11,48 @@ from youbot_motion_interface.msg import Acknowledgement
 from youbot_motion_interface.msg import Monitor
 from youbot_motion_interface.msg import Result
 
+import time
+import brics_actuator.msg
+class ArmMotionCoordinator:
+    def __init__(self):
+        self.moveit_event_in_pub = rospy.Publisher('/moveit_client/event_in', String, queue_size=1)
+        self.moveit_configuration_pub = rospy.Publisher('/moveit_client/target_configuration', brics_actuator.msg.JointPositions, queue_size=1)
+        self.moveit_pose_pub = rospy.Publisher('/moveit_client/target_pose', geometry_msgs.msg.PoseStamped, queue_size=1)
+        self.moveit_pose_name_pub = rospy.Publisher('/moveit_client/target_string_pose', String, queue_size=1)
+        rospy.Subscriber('/moveit_client/event_out', String, self.moveit_event_out_cb, queue_size=1)
+
+    def moveit_event_out_cb(self, msg):
+        if msg.data == 'e_success':
+            self.moveit_status = Result().ACTION_SUCCEEDED
+        elif msg.data == 'e_stopped':
+            self.moveit_status = Result().ACTION_PREEMPTED
+        elif msg.data == 'e_failure':
+            self.moveit_status = Result().ACTION_FAILED
+    
+    def execute_moveit_pose_name_motion(self, goal_pose_name):
+        self.moveit_pose_name_pub.publish(goal_pose_name)
+        self.moveit_event_in_pub.publish('e_start') 
+        self.moveit_status = 'active'
+
+    def execute_moveit_pose_motion(self, goal_pose):
+        self.moveit_pose_name_pub.publish(goal_pose)
+        self.moveit_event_in_pub.publish('e_start') 
+        self.moveit_status = 'active'
+
+    def execute_moveit_joint_configuration_motion(self, joint_configuration):
+        self.moveit_pose_name_pub.publish(joint_configuration)
+        self.moveit_event_in_pub.publish('e_start') 
+        self.moveit_status = 'active'
+
+    def get_moveit_status(self):
+        return self.moveit_status
+
+
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+
 class BaseMotionCoordinator:
     def __init__(self):
         self.dbc_pose_pub = rospy.Publisher('/mcr_navigation/direct_base_controller/input_pose', geometry_msgs.msg.PoseStamped, queue_size=1)
@@ -71,14 +113,16 @@ class MotionCoordinator:
         rospy.Subscriber('~youbot_motion_goal', Goal, self.motion_command_cb, queue_size=1)
 
         self.base_motion_coordinator = BaseMotionCoordinator()
+        self.arm_motion_coordinator = ArmMotionCoordinator()
         self.base_command_action_type = Goal().base.DEFAULT
+        self.arm_command_action_type = Goal().arm.DEFAULT
         self.base_state = 'IDLE'
         self.arm_state = 'IDLE'
         self.whole_body_motion_flag = False
 
     def motion_command_cb(self, msg):
         if (msg.base.action_type in range(1,4) and not self.base_state == 'IDLE' and not msg.base.preempt_current_action) or \
-                      (msg.arm.action_type in range(1,5) not self.arm_state == 'IDLE' and not msg.arm.preempt_current_action):
+                      (msg.arm.action_type in range(1,5) and not self.arm_state == 'IDLE' and not msg.arm.preempt_current_action):
             self.send_acknowledgement(msg._connection_header['callerid'], msg.arm.action_type, msg.base.action_type, \
                              Acknowledgement().REQUEST_REJECTED, Acknowledgement().DIFFERENT_ACTION_IS_RUNNING_ERROR)                
         else:
@@ -145,7 +189,7 @@ class MotionCoordinator:
         else:
             result_msg.caller_id = self.base_command_caller_id
             result_msg.action_type = self.base_command_action_type
-            self.base_command_action_type = Goal().arm.DEFAULT
+            self.base_command_action_type = Goal().base.DEFAULT
         result_msg.action_name = ['idle', 'move base pose', 'move base name', 'dbc'][result_msg.action_type]
         result_msg.status = ['failed', 'succeeded', 'preempted'][result_msg.status_type]
         self.result_pub.publish(result_msg)
@@ -154,34 +198,58 @@ class MotionCoordinator:
         print 'READY!'
         while not rospy.is_shutdown():
             if self.base_state == 'IDLE':
-                self.execute_idle_state()
+                self.execute_base_idle_state()
             elif self.base_state == 'DBC':
                 self.execute_dbc_command_state()
             else:
                 self.execute_move_base_command_state()
+
+            if self.arm_state == 'IDLE':
+                self.execute_arm_idle_state()
+            elif self.arm_state == 'MOVEIT':
+                self.execute_moveit_command_state()
+            else:
+                self.execute_cvc_command_state() #cartesian velocity controller
             rospy.sleep(0.1)
             self.send_monitor_feedback()
 
-    def execute_idle_state(self):
+    def execute_arm_idle_state(self):
+        if self.arm_command_action_type == Goal().arm.ACTION_TYPE_MOVEIT_NAME:
+            self.arm_state = 'MOVEIT'
+            self.arm_motion_coordinator.execute_moveit_pose_name_motion(self.arm_command_goal_name)
+            print 'moving'
+           
+    def execute_moveit_command_state(self):
+        if not self.arm_motion_coordinator.get_moveit_status() == 'active': 
+            print 'MOVEIT RESULT !!!: '
+            print self.arm_motion_coordinator.moveit_status
+#            self.send_result(self.base_motion_coordinator.dbc_status)
+            self.arm_state = 'IDLE'
+            self.arm_command_action_type = Goal().arm.DEFAULT
+ 
+    def execute_base_idle_state(self):
         base_acknowledgement = 'accepted'
-        if self.base_command_action_type == Goal().arm.ACTION_TYPE_DBC_POSE:
+        if self.base_command_action_type == Goal().base.ACTION_TYPE_DBC_POSE:
             self.base_state = 'DBC'
             self.base_motion_coordinator.execute_dbc_motion(self.base_command_goal_pose)
-        elif self.base_command_action_type == Goal().arm.ACTION_TYPE_MOVE_BASE_POSE or self.base_command_action_type == Goal().arm.ACTION_TYPE_MOVE_BASE_NAME:
-            if self.base_command_action_type == Goal().arm.ACTION_TYPE_MOVE_BASE_NAME:
+        elif self.base_command_action_type == Goal().base.ACTION_TYPE_MOVE_BASE_POSE or self.base_command_action_type == Goal().base.ACTION_TYPE_MOVE_BASE_NAME:
+            if self.base_command_action_type == Goal().base.ACTION_TYPE_MOVE_BASE_NAME:
                 self.base_command_goal_pose = param_server_utils.get_pose_from_param_server(self.base_command_goal_name)
                 if self.base_command_goal_pose is None:
                     base_acknowledgement = 'rejected'
-                    self.base_command_action_type = Goal().arm.DEFAULT
+                    self.base_command_action_type = Goal().base.DEFAULT
                     return
             self.base_state = 'MOVE_BASE'
             self.base_motion_coordinator.execute_move_base_motion(self.base_command_goal_pose)
+        else: 
+            base_acknowledgement = 'unspecified'
         if base_acknowledgement == 'accepted':
-            self.send_acknowledgement(self.base_command_caller_id, self.base_command_action_type)
-        else:
+            self.send_acknowledgement(self.base_command_caller_id, self.base_command_action_type, self.arm_command_action_type)
+        elif base_acknowledgement == 'rejected':
             self.send_acknowledgement(self.base_command_caller_id, self.base_command_action_type, Acknowledgement().REQUEST_REJECTED, \
                                                                                              Acknowledgement().INVALID_POSE_NAME_ERROR)
-        
+        else:
+            pass
             
     def execute_dbc_command_state(self):
         if not self.base_motion_coordinator.get_dbc_status() == 'active': 
