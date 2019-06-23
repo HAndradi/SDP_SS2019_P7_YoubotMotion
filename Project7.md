@@ -28,7 +28,7 @@ Mihir Mulye:
 
    * I installed youbot simulation software 
    * I will learn how to use the software in a more detailed manner
-   * 
+   
 
 Heruka Andradi:
 
@@ -49,7 +49,7 @@ Mihir Mulye:
 
    * Worked on basic control flow of the task process 
    * Work with Heruka to modify the task process according to his code. Modify the test code according to the repository code 
-   * 
+   
 
 Heruka Andradi:
 
@@ -80,5 +80,66 @@ Carlo Wiesse:
 
    * mcr_moveit_client package revision and transfer knowledge about it to teammates.
    * Contribution to graphical representation of pipeline by listing topics and message types to communicate with arm.
+   
+### Date: 27.05.2019
+
+Mihir Mulye:
+
+   * Carlo and I created message files and Interface files
+  
+
+Heruka Andradi:
+
+   * Made a ros package to provide move_base and direct_base_controller based motion commands to the youbot using a single rostopic. Identified how to obtain the node name of subscribers for monitoring and feedback.
+   * Incorporate moveit and monitoring to the ros package. Figure out how to cancel move_base_safe commands
+   * Might not be able to cancel move_base_safe commands without modifying the move_base_safe package
+
+Carlo Wiesse:
+
+   *
+   *
+   *
+   
+### Date: 03.06.2019
+
+Mihir Mulye:
+
+   * Carlo and i worked on the task of moving arm using custom file on the simulation. 
+   * test the package 'youbot_motion_interface package' on the youbot write a script to publish commands to the youbot_motion_interface package by passing arguments to the python file. 
+   
+  
+
+Heruka Andradi:
+
+   * Incorporated preemption, request acknowledgement,and result feedback functionalities to the youbot_motion_interface package to give goal pose or goal name based commands to the youbot using move_base or direct_base_control packages.
+   * Integrate arm functionality to the youbot_motion_interface package
+   * Might come across unexpected issues during integration
+
+Carlo Wiesse:
+
+   *
+   *
+   *
+   
+   ### Date: 17.06.2019
+
+Mihir Mulye:
+
+   * tested the package 'youbot_motion_interface package' on the youbot 
+   * write a script to publish commands to the youbot_motion_interface package by passing arguments to the python file. 
+   
+  
+
+Heruka Andradi:
+
+   * Refactored the code and seperated the functionality into different classes. Added a monitor feedback functionality.
+   * Integrate the arm_motion_interface package from Carlo to the youbot_motion_interace.
+   *
+   
+Carlo Wiesse:
+
+   *
+   *
+   *
 
 
