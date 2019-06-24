@@ -141,5 +141,26 @@ Carlo Wiesse:
    *
    *
    *
+   
+   ### Date: 24.06.2019
+
+Mihir Mulye:
+
+   * 
+   * 
+   
+  
+
+Heruka Andradi:
+
+   * Refactortored the youbot_motion_interface pakcage to accomodate arm motion commands. Tested giving simultaneous base motion commands with moveit name based arm motion commands.
+   * Integrate the rest of the arm motion functionality and test on the youbot.
+   *
+   
+Carlo Wiesse:
+
+   *
+   *
+   *
 
 
