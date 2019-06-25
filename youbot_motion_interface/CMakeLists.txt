@@ -54,6 +54,7 @@ add_message_files(
    Goal.msg
    Acknowledgement.msg
    Result.msg
+   Monitor.msg
 #   Message1.msg
 #   Message2.msg
 )
@@ -109,10 +110,11 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES youbot_motion_interface
-  CATKIN_DEPENDS rospy std_msgs message_runtime
-#  DEPENDS system_lib
+  CATKIN_DEPENDS
+  rospy
+  std_msgs
+  message_runtime
+#  mir_move_base_safe
 )
 
 ###########
