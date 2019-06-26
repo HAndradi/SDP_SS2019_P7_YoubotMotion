@@ -81,7 +81,7 @@ class VelocityCommander:
                 self.event_out.publish('e_stopped')
                 break
 
-            if count % 1000 == 0 and count > 0:
+            if count % 2000 == 0 and count > 0:
 
                 if np.allclose(current_pos,old_pos):
                     self.event_out.publish('e_failure')

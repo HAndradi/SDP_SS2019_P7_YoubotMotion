@@ -8,7 +8,6 @@ import rospkg
 rospack = rospkg.RosPack()
 sys.path.insert(0, rospack.get_path("mir_move_base_safe")+'/ros/scripts/')
 import param_server_utils
-#from /home/carlo/robocup/src/unmerged_packages_for_testing/task_planning/mir_yb_actions/mir_move_base_safe/ros/scripts/param_server_utils import *
 
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
@@ -21,6 +20,8 @@ from youbot_motion_interface.msg import Action_Info
 import time
 from  brics_actuator.msg import JointPositions
 from  brics_actuator.msg import JointValue
+
+
 class ArmMotionCoordinator:
     def __init__(self):
         self.moveit_event_in_pub = rospy.Publisher('/moveit_client/event_in', String, queue_size=1)
