@@ -21,7 +21,10 @@ class ArmMotionCoordinator:
         self.moveit_configuration_pub = rospy.Publisher('/moveit_client/target_configuration', JointPositions, queue_size=1)
         self.moveit_pose_pub = rospy.Publisher('/moveit_client/target_pose', PoseStamped, queue_size=1)
         self.moveit_pose_name_pub = rospy.Publisher('/moveit_client/target_string_pose', String, queue_size=1)
+        self.cvc_event_in_pub = rospy.Publisher('/CVC_node/event_in', String, queue_size=1)
+        self.cvc_pose_pub = rospy.Publisher('/CVC_node/target_pose', PoseStamped, queue_size=1)
         rospy.Subscriber('/moveit_client/event_out', String, self.moveit_event_out_cb, queue_size=1)
+        rospy.Subscriber('/CVC_node/event_out', String, self.cvc_event_out_cb)
 
     def moveit_event_out_cb(self, msg):
         if msg.data == 'e_success':
@@ -31,13 +34,21 @@ class ArmMotionCoordinator:
         elif msg.data == 'e_failure':
             self.moveit_status = Result().STATUS_TYPE_FAILED
     
+    def cvc_event_out_cb(self, msg):
+        if msg.data == 'e_success':
+            self.cvc_status = Result().STATUS_TYPE_SUCCEEDED
+        elif msg.data == 'e_stopped':
+            self.cvc_status = Result().STATUS_TYPE_PREEMPTED
+        elif msg.data == 'e_failure':
+            self.cvc_status = Result().STATUS_TYPE_FAILED
+    
     def execute_moveit_pose_name_motion(self, target_pose_name):
         self.moveit_pose_name_pub.publish(target_pose_name)
         self.moveit_event_in_pub.publish('e_start') 
         self.moveit_status = 'active'
 
     def execute_moveit_pose_motion(self, target_pose):
-        self.moveit_pose_name_pub.publish(target_pose)
+        self.moveit_pose_pub.publish(target_pose)
         self.moveit_event_in_pub.publish('e_start') 
         self.moveit_status = 'active'
 
@@ -53,8 +64,19 @@ class ArmMotionCoordinator:
         self.moveit_event_in_pub.publish('e_start') 
         self.moveit_status = 'active'
 
+    def execute_cvc_pose_motion(self, target_pose):
+        self.cvc_pose_pub.publish(target_pose)
+        self.cvc_event_in_pub.publish('e_start') 
+        self.cvc_status = 'active'
+
+    def preempt_cvc_motion(self):
+        self.cvc_event_in_pub.publish('e_stop')
+
     def get_moveit_status(self):
         return self.moveit_status
+
+    def get_cvc_status(self):
+        return self.cvc_status
 
 
 ##########################################################################################
@@ -271,7 +293,7 @@ class MotionCoordinator:
             elif self.arm_state == 'MOVEIT':
                 self.execute_moveit_command_state()
             elif self.arm_state == 'CVC':
-                self.execute_cvc_command_state() #cartesian velocity controller
+                self.execute_cvc_command_state() 
             rospy.sleep(0.1)
             self.send_monitor_feedback()
 
@@ -285,12 +307,22 @@ class MotionCoordinator:
         elif self.arm_command_action_type == Goal().arm.ACTION_TYPE_MOVEIT_JOINTS:
             self.arm_state = 'MOVEIT'
             self.arm_motion_coordinator.execute_moveit_joint_config_motion(self.arm_command_target_joint_config)
+        elif self.arm_command_action_type == Goal().arm.ACTION_TYPE_CVC_POSE:
+            self.arm_state = 'CVC'
+            self.arm_motion_coordinator.execute_cvc_pose_motion(self.arm_command_target_pose)
            
     def execute_moveit_command_state(self):
         if not self.arm_motion_coordinator.get_moveit_status() == 'active':
             self.send_result(self.arm_motion_coordinator.get_moveit_status(), 'arm_command')
             self.arm_state = 'IDLE'
-            self.arm_command_action_type = Goal().arm.ACTION_TYPE_DEFAULT
+ 
+    def execute_cvc_command_state(self):
+        if not self.arm_motion_coordinator.get_cvc_status() == 'active':
+            self.send_result(self.arm_motion_coordinator.get_cvc_status(), 'arm_command')
+            self.arm_state = 'IDLE'
+        if self.arm_command_preempt_flag:
+            self.arm_motion_coordinator.preempt_cvc_motion()
+            self.arm_command_preempt_flag = False
  
     def execute_base_idle_state(self):
         if self.base_command_action_type == Goal().base.ACTION_TYPE_DBC_NAME or self.base_command_action_type == Goal().base.ACTION_TYPE_MOVE_BASE_NAME:
