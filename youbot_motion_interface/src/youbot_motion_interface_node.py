@@ -267,7 +267,7 @@ class MotionCoordinator:
         elif command_type == 'arm_command':
             if status_type == Result().STATUS_TYPE_PREEMPTED:
                 result_msg.caller_id = self.arm_preempted_caller_id
-                result_msg.action_type = self.arm_preempted_action_type
+                result_msg.arm_action.type = self.arm_preempted_action_type
             else:
                 result_msg.caller_id = self.arm_command_caller_id
                 result_msg.arm_action.type = self.arm_command_action_type
