@@ -4,6 +4,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
 from  brics_actuator.msg import JointPositions
 from  brics_actuator.msg import JointValue
+from youbot_motion_interace import Result
 
 class ArmMotionCoordinator:
     def __init__(self):
@@ -18,19 +19,19 @@ class ArmMotionCoordinator:
 
     def moveit_event_out_cb(self, msg):
         if msg.data == 'e_success':
-            self.moveit_status = Result().STATUS_TYPE_SUCCEEDED
+            self.moveit_status = Result.STATUS_TYPE_SUCCEEDED
         elif msg.data == 'e_stopped':
-            self.moveit_status = Result().STATUS_TYPE_PREEMPTED
+            self.moveit_status = Result.STATUS_TYPE_PREEMPTED
         elif msg.data == 'e_failure':
-            self.moveit_status = Result().STATUS_TYPE_FAILED
+            self.moveit_status = Result.STATUS_TYPE_FAILED
 
     def cvc_event_out_cb(self, msg):
         if msg.data == 'e_success':
-            self.cvc_status = Result().STATUS_TYPE_SUCCEEDED
+            self.cvc_status = Result.STATUS_TYPE_SUCCEEDED
         elif msg.data == 'e_stopped':
-            self.cvc_status = Result().STATUS_TYPE_PREEMPTED
+            self.cvc_status = Result.STATUS_TYPE_PREEMPTED
         elif msg.data == 'e_failure':
-            self.cvc_status = Result().STATUS_TYPE_FAILED
+            self.cvc_status = Result.STATUS_TYPE_FAILED
 
     def execute_moveit_pose_name_motion(self, target_pose_name):
         self.moveit_pose_name_pub.publish(target_pose_name)
