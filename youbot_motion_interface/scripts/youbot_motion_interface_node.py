@@ -1,9 +1,14 @@
 #! /usr/bin/env python
+import sys
 import rospy
-import roslib
-import numpy as np
+import rospkg
+
+rospack = rospkg.RosPack()
+sys.path.insert(0, rospack.get_path("mir_move_base_safe")+'/ros/scripts/')
 import param_server_utils
 
+from arm_motion_coordinator.ArmMotionCoordinator
+from base_motion_coordinator import BaseMotionCoordinator
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
 from youbot_motion_interface.msg import Goal
@@ -11,131 +16,6 @@ from youbot_motion_interface.msg import Acknowledgement
 from youbot_motion_interface.msg import Monitor
 from youbot_motion_interface.msg import Result
 from youbot_motion_interface.msg import Action_Info
-
-import time
-from  brics_actuator.msg import JointPositions
-from  brics_actuator.msg import JointValue
-class ArmMotionCoordinator:
-    def __init__(self):
-        self.moveit_event_in_pub = rospy.Publisher('/moveit_client/event_in', String, queue_size=1)
-        self.moveit_configuration_pub = rospy.Publisher('/moveit_client/target_configuration', JointPositions, queue_size=1)
-        self.moveit_pose_pub = rospy.Publisher('/moveit_client/target_pose', PoseStamped, queue_size=1)
-        self.moveit_pose_name_pub = rospy.Publisher('/moveit_client/target_string_pose', String, queue_size=1)
-        self.cvc_event_in_pub = rospy.Publisher('/CVC_node/event_in', String, queue_size=1)
-        self.cvc_pose_pub = rospy.Publisher('/CVC_node/target_pose', PoseStamped, queue_size=1)
-        rospy.Subscriber('/moveit_client/event_out', String, self.moveit_event_out_cb, queue_size=1)
-        rospy.Subscriber('/CVC_node/event_out', String, self.cvc_event_out_cb)
-
-    def moveit_event_out_cb(self, msg):
-        if msg.data == 'e_success':
-            self.moveit_status = Result().STATUS_TYPE_SUCCEEDED
-        elif msg.data == 'e_stopped':
-            self.moveit_status = Result().STATUS_TYPE_PREEMPTED
-        elif msg.data == 'e_failure':
-            self.moveit_status = Result().STATUS_TYPE_FAILED
-    
-    def cvc_event_out_cb(self, msg):
-        if msg.data == 'e_success':
-            self.cvc_status = Result().STATUS_TYPE_SUCCEEDED
-        elif msg.data == 'e_stopped':
-            self.cvc_status = Result().STATUS_TYPE_PREEMPTED
-        elif msg.data == 'e_failure':
-            self.cvc_status = Result().STATUS_TYPE_FAILED
-    
-    def execute_moveit_pose_name_motion(self, target_pose_name):
-        self.moveit_pose_name_pub.publish(target_pose_name)
-        self.moveit_event_in_pub.publish('e_start') 
-        self.moveit_status = 'active'
-
-    def execute_moveit_pose_motion(self, target_pose):
-        self.moveit_pose_pub.publish(target_pose)
-        self.moveit_event_in_pub.publish('e_start') 
-        self.moveit_status = 'active'
-
-    def execute_moveit_joint_config_motion(self, target_joint_config):
-        target_joint_config_msg = JointPositions()
-        for i,joint_val in enumerate(target_joint_config):
-            joint = JointValue()
-            joint.joint_uri = 'arm_joint_'+str(i+1)
-            joint.unit = 'rad'
-            joint.value = joint_val
-            target_joint_config_msg.positions.append(joint)
-        self.moveit_configuration_pub.publish(target_joint_config_msg)
-        self.moveit_event_in_pub.publish('e_start') 
-        self.moveit_status = 'active'
-
-    def execute_cvc_pose_motion(self, target_pose):
-        self.cvc_pose_pub.publish(target_pose)
-        self.cvc_event_in_pub.publish('e_start') 
-        self.cvc_status = 'active'
-
-    def preempt_cvc_motion(self):
-        self.cvc_event_in_pub.publish('e_stop')
-
-    def get_moveit_status(self):
-        return self.moveit_status
-
-    def get_cvc_status(self):
-        return self.cvc_status
-
-
-##########################################################################################
-##########################################################################################
-##########################################################################################
-
-
-class BaseMotionCoordinator:
-    def __init__(self):
-        self.dbc_pose_pub = rospy.Publisher('/mcr_navigation/direct_base_controller/input_pose', PoseStamped, queue_size=1)
-        self.dbc_event_in_pub = rospy.Publisher('/mcr_navigation/direct_base_controller/coordinator/event_in', String, queue_size=1)
-        self.move_base_pose_pub = rospy.Publisher('/move_base_wrapper/pose_in', PoseStamped, queue_size=1)
-        self.move_base_event_in_pub = rospy.Publisher('/move_base_wrapper/event_in', String, queue_size=1)
-        rospy.Subscriber('/mcr_navigation/direct_base_controller/coordinator/event_out', String, self.dbc_event_out_cb, queue_size=1)
-        rospy.Subscriber('/move_base_wrapper/event_out', String, self.move_base_event_out_cb, queue_size=1)
-
-    def dbc_event_out_cb(self, msg):
-        if msg.data == 'e_success':
-            self.dbc_status = Result().STATUS_TYPE_SUCCEEDED
-        elif msg.data == 'e_stopped':
-            self.dbc_status = Result().STATUS_TYPE_PREEMPTED
-        elif msg.data == 'e_failure':
-            self.dbc_status = Result().STATUS_TYPE_FAILED
-
-    def move_base_event_out_cb(self, msg):
-        if msg.data == 'e_success':
-            self.move_base_status = Result().STATUS_TYPE_SUCCEEDED
-        elif msg.data == 'e_stopped':
-            self.move_base_status = Result().STATUS_TYPE_PREEMPTED
-        elif msg.data == 'e_failure':
-            self.move_base_status = Result().STATUS_TYPE_FAILED
-
-    def execute_dbc_motion(self, target_pose):
-        self.dbc_pose_pub.publish(target_pose)
-        self.dbc_event_in_pub.publish('e_start')
-        self.dbc_status = 'active'
-
-    def execute_move_base_motion(self, target_pose):
-        self.move_base_pose_pub.publish(target_pose)
-        self.move_base_event_in_pub.publish('e_start')
-        self.move_base_status = 'active'
-
-    def preempt_dbc_motion(self):
-        self.dbc_event_in_pub.publish('e_stop')
-    
-    def preempt_move_base_motion(self):
-        self.move_base_event_in_pub.publish('e_stop')
-
-    def get_dbc_status(self):
-        return self.dbc_status
-    
-    def get_move_base_status(self):
-        return self.move_base_status
-
-
-##########################################################################################
-##########################################################################################
-##########################################################################################
-
 
 class MotionCoordinator:
     def __init__(self):
