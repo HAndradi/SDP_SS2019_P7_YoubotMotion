@@ -3,6 +3,7 @@ import rospy
 
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
+from youbot_motion_interface.msg import Result
 
 class BaseMotionCoordinator:
     def __init__(self):
@@ -15,19 +16,19 @@ class BaseMotionCoordinator:
 
     def dbc_event_out_cb(self, msg):
         if msg.data == 'e_success':
-            self.dbc_status = Result().STATUS_TYPE_SUCCEEDED
+            self.dbc_status = Result.STATUS_TYPE_SUCCEEDED
         elif msg.data == 'e_stopped':
-            self.dbc_status = Result().STATUS_TYPE_PREEMPTED
+            self.dbc_status = Result.STATUS_TYPE_PREEMPTED
         elif msg.data == 'e_failure':
-            self.dbc_status = Result().STATUS_TYPE_FAILED
+            self.dbc_status = Result.STATUS_TYPE_FAILED
 
     def move_base_event_out_cb(self, msg):
         if msg.data == 'e_success':
-            self.move_base_status = Result().STATUS_TYPE_SUCCEEDED
+            self.move_base_status = Result.STATUS_TYPE_SUCCEEDED
         elif msg.data == 'e_stopped':
-            self.move_base_status = Result().STATUS_TYPE_PREEMPTED
+            self.move_base_status = Result.STATUS_TYPE_PREEMPTED
         elif msg.data == 'e_failure':
-            self.move_base_status = Result().STATUS_TYPE_FAILED
+            self.move_base_status = Result.STATUS_TYPE_FAILED
 
     def execute_dbc_motion(self, target_pose):
         self.dbc_pose_pub.publish(target_pose)
