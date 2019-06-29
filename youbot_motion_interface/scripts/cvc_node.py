@@ -28,7 +28,7 @@ class VelocityCommander:
         PUBLISHERS
         '''
         self.event_out = rospy.Publisher('~event_out', String, queue_size=1)
-        self.velocity_pub = rospy.Publisher('/arm_1/arm_controller/cartesian_velocity_command', TwistStamped, queue_size=1)
+        self.velocity_pub = rospy.Publisher('~cartesian_velocity_command', TwistStamped, queue_size=1)
 
         '''
         SUBSCRIBERS
