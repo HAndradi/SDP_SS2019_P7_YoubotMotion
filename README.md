@@ -1,6 +1,6 @@
 # sdp_ss2019_P7_YoubotMotion
 
-![Python version](https://img.shields.io/badge/PyPI-v2.7-brightgreen.svg) ![GitHub contributors](https://img.shields.io/badge/contributors-3-blue.svg) ![GitHub issues](https://img.shields.io/badge/issues-11-critical.svg)
+![Python version](https://img.shields.io/badge/PyPI-v2.7-brightgreen.svg) ![GitHub contributors](https://img.shields.io/badge/contributors-3-blue.svg) ![GitHub issues](https://img.shields.io/badge/issues-0-critical.svg)
 
 ## Install Ubuntu
 The repository and its related components have been tested under the following Ubuntu distributions:
