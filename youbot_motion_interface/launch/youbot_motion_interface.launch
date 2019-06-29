@@ -1,0 +1,13 @@
+<launch>
+    <node pkg="youbot_motion_interface" type="youbot_motion_interface_node.py" name="youbot_motion_interface" output="screen">
+    </node>
+
+    <node pkg="youbot_motion_interface" type="cvc_node.py" name="CVC_node" output="screen"> 
+        <remap from="~cartesian_velocity_command" to="/arm_1/arm_controller/cartesian_velocity_command"/>
+    </node>
+
+    <include file="$(find mir_2dnav)/ros/launch/2dnav.launch"/>
+    <include file="$(find mcr_direct_base_controller)/ros/launch/direct_base_controller.launch"/>
+    <include file="$(find mir_move_base_safe)/ros/launch/move_base.launch"/>
+    <include file="$(find mcr_moveit_client)/ros/launch/moveit_client.launch"/>
+</launch>

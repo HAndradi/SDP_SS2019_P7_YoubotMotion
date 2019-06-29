@@ -2,9 +2,9 @@
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
-from  brics_actuator.msg import JointPositions
-from  brics_actuator.msg import JointValue
-from youbot_motion_interace import Result
+from brics_actuator.msg import JointPositions
+from brics_actuator.msg import JointValue
+from youbot_motion_interface.msg import Result
 
 class ArmMotionCoordinator:
     def __init__(self):
