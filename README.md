@@ -105,18 +105,14 @@ The ROBOT_ENV variable can be used to switch between different environments. The
 ### In Simulation
 
      roslaunch mir_bringup_sim robot.launch
-     
-     
-In a new terminal you can open the Rviz GUI to see the environment and the robot
-
-     rviz
+     roslaunch ~/kinetic/src/mas_industrial_robotics/mir_manipulation/mir_moveit_youbot/youbot-brsu-1/move_group.launch     
 
 ### At the Real Robot
 
      roslaunch mir_bringup robot.launch
-     
+     roslaunch mir_planning_bringup robot.launch     
 
-## Test simultaneous arm and base motion package 
+## Use youbot motion package 
 
     roslaunch youbot_motion_interface youbot_motion_interface.launch 
 
