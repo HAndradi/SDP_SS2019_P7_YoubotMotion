@@ -27,8 +27,10 @@ class MotionCoordinator:
         self.arm_motion_coordinator = ArmMotionCoordinator()
         self.base_motion_coordinator = BaseMotionCoordinator()
 
-        self.arm_action_types = {Action_Info().ACTION_TYPE_MOVEIT_POSE:'Moveit pose', Action_Info().ACTION_TYPE_MOVEIT_NAME:'Moveit name', Action_Info().ACTION_TYPE_MOVEIT_JOINTS:'Moveit joints', Action_Info().ACTION_TYPE_CVC_POSE:'CVC pose'}
-        self.base_action_types = {Action_Info().ACTION_TYPE_MOVE_BASE_POSE:'Move base pose', Action_Info().ACTION_TYPE_MOVE_BASE_NAME:'Move base name', Action_Info().ACTION_TYPE_DBC_POSE:'DBC pose', Action_Info().ACTION_TYPE_DBC_NAME:'DBC name'}
+        self.arm_action_types = {Action_Info().ACTION_TYPE_MOVEIT_POSE:'Moveit pose', Action_Info().ACTION_TYPE_MOVEIT_NAME:'Moveit name', \
+        Action_Info().ACTION_TYPE_MOVEIT_JOINTS:'Moveit joints', Action_Info().ACTION_TYPE_CVC_POSE:'CVC pose'}
+        self.base_action_types = {Action_Info().ACTION_TYPE_MOVE_BASE_POSE:'Move base pose', Action_Info().ACTION_TYPE_MOVE_BASE_NAME:'Move base name', \
+        Action_Info().ACTION_TYPE_DBC_POSE:'DBC pose', Action_Info().ACTION_TYPE_DBC_NAME:'DBC name'}
 
         self.acknowledgement_status_types = {Acknowledgement().STATUS_TYPE_REJECTED:'Rejected', Acknowledgement().STATUS_TYPE_ACCEPTED:'Accepted'}
         self.acknowledgement_error_types = {Acknowledgement().ERROR_TYPE_INVALID_ACTION_TYPE:'An invalid action type has been entered.', \
@@ -38,7 +40,8 @@ class MotionCoordinator:
 
         self.result_status_types = {Result().STATUS_TYPE_FAILED:'failed', Result().STATUS_TYPE_SUCCEEDED:'succeeded', \
                                                                           Result().STATUS_TYPE_PREEMPTED:'preempted'}
-        self.result_error_types = {Result().ERROR_TYPE_NONE:'No errors', Result().ERROR_TYPE_CONTROLLER_FAILURE:'The controller failed to execute  action', Result().ERROR_TYPE_INVALID_POSE_NAME:'An invalid target pose name has been entered'}
+        self.result_error_types = {Result().ERROR_TYPE_NONE:'No errors', Result().ERROR_TYPE_CONTROLLER_FAILURE:'The controller failed to execute  action', \
+        Result().ERROR_TYPE_INVALID_POSE_NAME:'An invalid target pose name has been entered'}
 
         self.arm_command_action_type = Action_Info().ACTION_TYPE_DEFAULT
         self.base_command_action_type = Action_Info().ACTION_TYPE_DEFAULT
@@ -47,17 +50,18 @@ class MotionCoordinator:
         self.base_state = 'IDLE'
 
     def motion_command_cb(self, msg):
+        # Check for current motion states and preemption requests to determine if the motion command should be accepted or rejected
         if (not msg.arm.action_type in self.arm_action_types.keys() and not msg.arm.action_type == Action_Info().ACTION_TYPE_DEFAULT) or \
-             (not msg.base.action_type in self.base_action_types.keys() and not msg.base.action_type == Action_Info().ACTION_TYPE_DEFAULT):
+        (not msg.base.action_type in self.base_action_types.keys() and not msg.base.action_type == Action_Info().ACTION_TYPE_DEFAULT):
             self.send_acknowledgement(msg._connection_header['callerid'], msg.arm.action_type, msg.base.action_type, \
-                             Acknowledgement().STATUS_TYPE_REJECTED, Acknowledgement().ERROR_TYPE_INVALID_ACTION_TYPE)                
+            Acknowledgement().STATUS_TYPE_REJECTED, Acknowledgement().ERROR_TYPE_INVALID_ACTION_TYPE)                
         elif msg.arm.action_type in self.arm_action_types.keys() and self.arm_state == 'MOVEIT':
             self.send_acknowledgement(msg._connection_header['callerid'], msg.arm.action_type, msg.base.action_type, \
-                         Acknowledgement().STATUS_TYPE_REJECTED, Acknowledgement().ERROR_TYPE_ARM_CANNOT_BE_PREEMPTED)                
+            Acknowledgement().STATUS_TYPE_REJECTED, Acknowledgement().ERROR_TYPE_ARM_CANNOT_BE_PREEMPTED)                
         elif (msg.base.action_type in self.base_action_types.keys() and not self.base_state == 'IDLE' and not msg.base.preempt_current_action) or \
-                         (msg.arm.action_type in self.arm_action_types.keys() and not self.arm_state == 'IDLE' and not msg.arm.preempt_current_action):
+        (msg.arm.action_type in self.arm_action_types.keys() and not self.arm_state == 'IDLE' and not msg.arm.preempt_current_action):
             self.send_acknowledgement(msg._connection_header['callerid'], msg.arm.action_type, msg.base.action_type, \
-                      Acknowledgement().STATUS_TYPE_REJECTED, Acknowledgement().ERROR_TYPE_CONFLICTING_ACTION_RUNNING)                
+            Acknowledgement().STATUS_TYPE_REJECTED, Acknowledgement().ERROR_TYPE_CONFLICTING_ACTION_RUNNING)                
         else:
             self.send_acknowledgement(msg._connection_header['callerid'], msg.arm.action_type, msg.base.action_type)
             if msg.base.action_type in self.base_action_types.keys():
@@ -84,7 +88,8 @@ class MotionCoordinator:
                 self.arm_command_target_joint_config = msg.arm.target_joint_configuration
                 self.arm_command_caller_id = msg._connection_header['callerid']
 
-    def send_acknowledgement(self, caller_id, arm_action_type, base_action_type, status_type=Acknowledgement().STATUS_TYPE_ACCEPTED, error_type=Acknowledgement().ERROR_TYPE_NONE):
+    def send_acknowledgement(self, caller_id, arm_action_type, base_action_type, status_type=Acknowledgement().STATUS_TYPE_ACCEPTED, \
+    error_type=Acknowledgement().ERROR_TYPE_NONE):
         acknowledgement_msg = Acknowledgement()
         acknowledgement_msg.caller_id = caller_id 
         acknowledgement_msg.arm_action.type = arm_action_type
@@ -138,8 +143,8 @@ class MotionCoordinator:
             else:
                 result_msg.caller_id = self.base_command_caller_id
                 result_msg.base_action.type = self.base_command_action_type
+                self.base_command_action_type = Goal().base.ACTION_TYPE_DEFAULT
             result_msg.base_action.name = self.base_action_types[result_msg.base_action.type]
-            self.base_command_action_type = Goal().base.ACTION_TYPE_DEFAULT
         elif command_type == 'arm_command':
             if status_type == Result().STATUS_TYPE_PREEMPTED:
                 result_msg.caller_id = self.arm_preempted_caller_id
@@ -149,7 +154,6 @@ class MotionCoordinator:
                 result_msg.arm_action.type = self.arm_command_action_type
                 self.arm_command_action_type = Goal().arm.ACTION_TYPE_DEFAULT
             result_msg.arm_action.name = self.arm_action_types[result_msg.arm_action.type]
-            self.arm_command_action_type = Goal().base.ACTION_TYPE_DEFAULT
         result_msg.status_msg = self.result_status_types[status_type]
         result_msg.error_msg = self.result_error_types[error_type]
         self.result_pub.publish(result_msg)
