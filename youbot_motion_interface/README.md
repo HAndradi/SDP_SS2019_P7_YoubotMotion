@@ -16,7 +16,9 @@ The acknowledgement and result of the requested motion commands as well the acti
 The following commands could be run to view the information on these topics from the terminal,
 
 >rostopic echo /youbot_motion_interface/youbot_motion_acknowledgement
+
 >rostopic echo /youbot_motion_interface/youbot_motion_result
+
 >rostopic echo /youbot_motion_interface/youbot_motion_monitor_feedback
 
 
