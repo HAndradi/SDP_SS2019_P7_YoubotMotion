@@ -7,6 +7,7 @@ A motion command can be sent by publishing to the topic, "/youbot_motion_interfa
 The available action types for the arm and base motion can be found in the "Goal_Arm.msg" and "Goal_Base.msg" files. The following commands can be used to display the action types,
 
 >rosmsg show youbot_motion_interface/Goal_Arm
+
 >rosmsg show youbot_motion_interface/Goal_Base
 
 #### Displaying the feedback information
